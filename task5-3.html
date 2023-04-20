@@ -1,0 +1,91 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .gallery {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .gallery > * {
+            flex: 1 1 160px;
+        }
+        .card {
+            padding: 30px;
+        }
+        .card img {
+            width: 100%;
+        }
+        .d-none {
+            display: none;
+        }
+        .d-block {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <input type="text" name="" id="userInput" placeholder="Ведите любое число">
+    <button id="sendUserInputBtn">Отправить</button>
+    <span class="d-none" id="UserInputInvalid">число вне диапазона от 1 до 10</span>
+    <div id="responseResult" class="gallery"></div>
+    <script>
+        function useRequest(url, callback) {
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', url, true);
+    
+            xhr.onload = function() {
+            if (xhr.status != 200) {
+                console.log('Статус ответа: ', xhr.status);
+            } else {
+                const result = JSON.parse(xhr.response);
+                
+                if (callback) {            
+                callback(result);
+                }
+            }
+            };
+
+            xhr.onerror = function() {
+            console.log('Ошибка! Статус ответа: ', xhr.status);
+            };
+                    
+            xhr.send();
+        };
+  
+        function displayResult(apiData) {
+            let cards = '';
+            
+            apiData.forEach(elem => {
+                const cardBlock = `
+                <div class="card">
+                    <img
+                    src="${elem.download_url}"                    
+                    />
+                    <p>${elem.author}</p>
+                </div>
+                `;
+                cards = cards + cardBlock;
+            })
+              
+            responseResult.innerHTML = cards;
+        }
+
+        function checkUserInput(val) {
+            if (val <= 10) {
+                UserInputInvalid.className = "d-none"
+               useRequest(`https://picsum.photos/v2/list/?limit=${val}`, displayResult);
+            } else {
+                UserInputInvalid.className = "d-block"
+            }
+        }
+
+        sendUserInputBtn.addEventListener('click', () => {
+            const userInputValue = document.getElementById('userInput').value;           
+            checkUserInput(userInputValue);
+        })
+    </script>
+</body>
+</html>

@@ -1,0 +1,56 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+<script>
+    const parser = new DOMParser();
+
+    const xmlString = `
+     <list>
+        <student>
+            <name lang="en">
+                <first>Ivan</first>
+                <second>Ivanov</second>
+            </name>
+            <age>35</age>
+            <prof>teacher</prof>
+        </student>
+        <student>
+            <name lang="ru">
+            <first>Петр</first>
+            <second>Петров</second>
+            </name>
+            <age>58</age>
+            <prof>driver</prof>
+        </student>
+      </list>
+    `;
+    const xmlDOM = parser.parseFromString(xmlString, "text/xml");
+
+    const studentNode = xmlDOM.querySelectorAll("student")    
+    const xmlList = Array.from(studentNode);
+    const jsList = [];
+    const res = xmlList.forEach((student) => {
+       // debugger
+        const firstNode = student.querySelector("first")
+        const secondNode = student.querySelector("second")
+        const ageNode = student.querySelector("age")
+        const profNode = student.querySelector("prof")
+        const langAttr = student.querySelector("name").getAttribute('lang')
+
+        const jsStudent = {
+            name: firstNode.textContent + secondNode.textContent,
+            age: Number(ageNode.textContent),
+            prof: profNode.textContent,
+            lang: langAttr
+         };
+         jsList.push(jsStudent)
+    })
+    console.log({list: jsList})   
+</script>
+</body>
+</html>

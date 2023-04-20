@@ -1,0 +1,123 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Дай мне картиночки </title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="get-image.css">
+</head>
+<body class="text-center">
+    <main>
+        <form class="form-get-image">
+        <picture class="icon">
+            <source type="image/avif" srcset="https://cdn3d.iconscout.com/3d/premium/thumb/gallery-5206760-4352351.png?f=avif 1x, 
+            https://cdn3d.iconscout.com/3d/premium/thumb/gallery-5206760-4352351.png?f=avif 2x"> 
+            <img width="150" height="150" alt="Gallery 3D Illustration" 
+            loading="lazy" 
+            src="https://cdn3d.iconscout.com/3d/premium/thumb/gallery-5206760-4352351.png?f=webp" 
+            srcset="https://cdn3d.iconscout.com/3d/premium/thumb/gallery-5206760-4352351.png?f=webp 1x, 
+            https://cdn3d.iconscout.com/3d/premium/thumb/gallery-5206760-4352351.png?f=webp 2x">
+        </picture>
+          <h1 class="h3 mb-3 fw-normal">Картиночки </h1>
+      
+          <div class="form-floating">
+            <input type="text" class="form-control i-width" id="PageNum" placeholder="Номер страницы">
+            <label for="">Номер страницы</label>
+          </div>
+          <div class="form-floating">
+            <input type="text" class="form-control i-height" id="LimNum" placeholder="Лимит">
+            <label for="">Лимит</label>
+          </div>     
+          <div class="invalid-feedback" id="MsgContainer"></div>
+          <button class="w-100 btn btn-lg btn-primary" id="SubmitBtn">Запрос</button>
+         
+          <p class="mt-5 mb-3 text-muted">© Солнечный апрель 2023</p>
+        </form>
+        <div id="cardContainer" class="gallery mt-20"></div>
+    </main>
+    <script>
+        window.onload = function(){
+            var imgArray = JSON.parse(localStorage.getItem('imgList'));
+            if (imgArray !== null) getFromStorage(imgArray);
+        }
+
+        function range(x, min, max) {
+            return x >= min && x <= max;
+        }
+
+        function displayResult(apiData) {
+            let cards = '';
+            debugger
+            apiData.forEach(elem => {
+                    const cardBlock = `
+                    <div class="card">
+                        
+                        <img
+                        src="${elem.download_url}"                    
+                        /><div class="card-body"></div>
+                        <div class="card-footer"><p>${elem.author}</p></div>
+                    </div>
+                    `;
+                    cards = cards + cardBlock;
+                })
+                
+                cardContainer.innerHTML = cards;
+        }
+
+        function saveInStorage(apiData){  
+            localStorage.setItem('imgList',JSON.stringify(apiData))
+        }
+
+        function getFromStorage(imgList){              
+            displayResult(imgList)
+        }
+        
+        async function sendRequest(page,limit){
+            //   https://picsum.photos/v2/list?page=1&limit=10
+            fetch(`https://picsum.photos/v2/list?page=${page}&limit${limit}`)
+            .then((response) => {         
+                return  response.json()   
+            })
+            .then((data) => {
+                console.log(data)
+                displayResult(data)
+                saveInStorage(data)
+            })
+        }
+
+        function checkUserInput(page,limit){
+        const msgContainer = document.getElementById("MsgContainer")
+            isPageAllright = range(page, 1, 10)
+            isLimitAllright = range(limit, 1, 10)
+            
+            if (isPageAllright && isLimitAllright) {        
+                    
+            sendRequest(page,limit)
+                msgContainer.classList.remove("d-block")
+            } else{
+                if (!isLimitAllright && !isPageAllright){
+                    msgContainer.textContent = "Номер страницы и лимит вне диапазона от 1 до 10"
+                    msgContainer.classList.add("d-block")
+            } else if(!isPageAllright) {
+                    msgContainer.textContent = "Номер страницы вне диапазона от 1 до 10"
+                    msgContainer.classList.add("d-block")
+            } else if (!isLimitAllright){
+                    msgContainer.textContent = "Лимит вне диапазона от 1 до 10"
+                    msgContainer.classList.add("d-block")
+            } 
+            }
+        }
+
+        const [pageNum,limNum,submitBtn] = [PageNum,LimNum,SubmitBtn]
+        
+        submitBtn.addEventListener('click', (e) => {
+        e.preventDefault()
+        const [page,limit] = [pageNum.value,limNum.value  ]
+
+        checkUserInput(page,limit);
+    })
+    </script>
+</body>
+</html>

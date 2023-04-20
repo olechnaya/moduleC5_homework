@@ -1,0 +1,86 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Дай мне картиночку </title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="get-image.css">
+</head>
+<body class="text-center">
+    <main class="form-get-image">
+        <form>
+        <picture class="icon">
+            <source type="image/avif" srcset="https://cdn3d.iconscout.com/3d/premium/thumb/gallery-5206760-4352351.png?f=avif 1x, 
+            https://cdn3d.iconscout.com/3d/premium/thumb/gallery-5206760-4352351.png?f=avif 2x"> 
+            <img width="150" height="150" alt="Gallery 3D Illustration" 
+            loading="lazy" 
+            src="https://cdn3d.iconscout.com/3d/premium/thumb/gallery-5206760-4352351.png?f=webp" 
+            srcset="https://cdn3d.iconscout.com/3d/premium/thumb/gallery-5206760-4352351.png?f=webp 1x, 
+            https://cdn3d.iconscout.com/3d/premium/thumb/gallery-5206760-4352351.png?f=webp 2x">
+        </picture>
+          <h1 class="h3 mb-3 fw-normal">Картиночку </h1>
+      
+          <div class="form-floating">
+            <input type="text" class="form-control i-width" id="InputWidth" placeholder="Ширина">
+            <label for="InputWidth">Шириной</label>
+          </div>
+          <div class="form-floating">
+            <input type="text" class="form-control i-height" id="InputHeight" placeholder="Длина">
+            <label for="InputHeight">Длиной</label>
+          </div>     
+          <div class="invalid-feedback" id="MsgContainer">Одно из чисел вне диапазона от 100 до 300</div>
+          <button class="w-100 btn btn-lg btn-primary" id="SubmitBtn">Дай!</button>
+          <div id="cardContainer" class="mt-20"></div>
+          <p class="mt-5 mb-3 text-muted">© Солнечный апрель 2023</p>
+        </form>
+        
+    </main>
+    <script>
+      function range(x, min, max) {
+        return x >= min && x <= max;
+    }
+
+    function displayResult(imgUrl) {
+        cardContainer.innerHTML = `
+        <div class="card">
+            <img
+            src="${imgUrl}"                    
+            />
+        </div>
+        `;
+    }
+
+    async function sendRequest(w,h){
+        fetch(`https://picsum.photos/${w}/${h}`)
+        .then((response) => {   
+            return response.url
+        })
+        .then((data) => {
+            displayResult(data)
+        })
+    }
+
+    function checkUserInput(w,h){
+      const msgContainer = document.getElementById("MsgContainer")
+        
+        if (range(w, 100, 300) && range(h, 100, 300)) {            
+            sendRequest(w,h)
+            msgContainer.classList.remove("d-block")
+        } else{
+            msgContainer.classList.add("d-block")
+        }
+    }
+
+    const [imgWidth,imgHeight,submitBtn] = [InputWidth,InputHeight,SubmitBtn]
+       
+    submitBtn.addEventListener('click', (e) => {
+        e.preventDefault()
+        const [imgW,imgH] = [imgWidth.value,imgHeight.value  ]
+
+        checkUserInput(imgW,imgH);
+    })
+    </script>
+</body>
+</html>
